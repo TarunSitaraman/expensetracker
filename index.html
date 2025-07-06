@@ -1,49 +1,156 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Expense Tracker</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
-<body>
-    <div class="main-container">
-        <h1>Expense Tracker</h1>
-        <form id="expense-form">
-            <div class="form-row">
-                <input type="text" id="description" placeholder="Description" required>
-                <input type="number" id="amount" placeholder="Amount" step="0.01" min="0" required>
-                <select id="category" required>
-                    <option value="">Select Category</option>
-                    <option value="Food">🍔 Food</option>
-                    <option value="Transport">🚗 Transport</option>
-                    <option value="Utilities">💡 Utilities</option>
-                    <option value="Entertainment">🎬 Entertainment</option>
-                    <option value="Other">✨ Other</option>
-                </select>
-                <input type="date" id="date" required>
-                <button type="submit">Add Expense</button>
-            </div>
-        </form>
-
-        <div class="expensetable-list">
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Description</th>
-                            <th>Amount</th>
-                            <th>Category</th>
-                            <th>Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="expense-body"></tbody>
-                </table>
-            </div>
-            <div id="total">Total: ₹<span id="total-amount">0.00</span></div>
-        </div>
+<body class="light-mode">
+  <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+    <span class="icon-sun"></span>
+    <span class="icon-moon"></span>
+  </button>
+  <div class="main-container card">
+    <h1>Expense Tracker</h1>
+    <form id="expense-form" autocomplete="off">
+      <div class="form-row">
+        <input type="text" id="description" placeholder="Description" required />
+        <input type="number" id="amount" placeholder="Amount" min="0" step="0.01" required />
+        <select id="category" required>
+          <option value="" disabled selected>Select Category</option>
+          <option>🍔 Food</option>
+          <option>🚗 Transport</option>
+          <option>💡 Utilities</option>
+          <option>🎬 Entertainment</option>
+          <option>✨ Other</option>
+        </select>
+        <input type="date" id="date" required />
+      </div>
+      <div class="center-btn">
+        <button type="submit" class="btn add-btn">Add Expense</button>
+      </div>
+    </form>
+    <div class="expensetable-list card">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="expense-body"></tbody>
+        </table>
+      </div>
+      <div id="total">Total: ₹<span id="total-amount">0.00</span></div>
     </div>
-    <script src="script.js"></script>
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("expense-form");
+      const body = document.getElementById("expense-body");
+      const totalDisplay = document.getElementById("total-amount");
+      const dateInput = document.getElementById("date");
+      const toggleBtn = document.getElementById('theme-toggle');
+      const htmlBody = document.body;
+
+      // Theme setup
+      const theme = localStorage.getItem('theme') || 'light-mode';
+      htmlBody.classList.add(theme);
+      toggleBtn.querySelector('.icon-sun').style.display = theme === 'dark-mode' ? 'none' : 'inline';
+      toggleBtn.querySelector('.icon-moon').style.display = theme === 'dark-mode' ? 'inline' : 'none';
+
+      toggleBtn.addEventListener('click', () => {
+        if (htmlBody.classList.contains('light-mode')) {
+          htmlBody.classList.replace('light-mode', 'dark-mode');
+          localStorage.setItem('theme', 'dark-mode');
+          toggleBtn.querySelector('.icon-sun').style.display = 'none';
+          toggleBtn.querySelector('.icon-moon').style.display = 'inline';
+        } else {
+          htmlBody.classList.replace('dark-mode', 'light-mode');
+          localStorage.setItem('theme', 'light-mode');
+          toggleBtn.querySelector('.icon-sun').style.display = 'inline';
+          toggleBtn.querySelector('.icon-moon').style.display = 'none';
+        }
+      });
+
+      // Date setup
+      function getToday() {
+        const d = new Date();
+        return d.toISOString().split('T')[0];
+      }
+      dateInput.value = getToday();
+
+      // Expense logic
+      let expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+
+      function formatDateToUK(iso) {
+        const [y, m, d] = iso.split("-");
+        return `${d}/${m}/${y}`;
+      }
+
+      function animateRow(row, type) {
+        row.classList.add(type);
+        setTimeout(() => {
+          row.classList.remove(type);
+        }, 600);
+      }
+
+      function updateUI() {
+        body.innerHTML = "";
+        let total = 0;
+        expenses.forEach((e, i) => {
+          total += parseFloat(e.amount);
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${e.description}</td>
+            <td>₹${parseFloat(e.amount).toFixed(2)}</td>
+            <td>${e.category}</td>
+            <td>${formatDateToUK(e.date)}</td>
+            <td>
+              <button class="btn remove-btn" data-index="${i}" title="Delete">🗑️</button>
+            </td>
+          `;
+          body.appendChild(row);
+          animateRow(row, "added");
+        });
+        totalDisplay.textContent = total.toFixed(2);
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const description = document.getElementById("description").value.trim();
+        const amount = document.getElementById("amount").value;
+        const category = document.getElementById("category").value;
+        const date = document.getElementById("date").value;
+        if (!description || !amount || !category || !date) return;
+
+        expenses.push({ description, amount, category, date });
+        localStorage.setItem("expenses", JSON.stringify(expenses));
+        updateUI();
+        form.reset();
+        dateInput.value = getToday();
+      });
+
+      body.addEventListener("click", (e) => {
+        if (e.target.classList.contains("remove-btn")) {
+          const idx = e.target.getAttribute("data-index");
+          const row = e.target.closest("tr");
+          row.classList.add("removed");
+          setTimeout(() => {
+            expenses.splice(idx, 1);
+            localStorage.setItem("expenses", JSON.stringify(expenses));
+            updateUI();
+          }, 600);
+        }
+      });
+
+      updateUI();
+    });
+  </script>
 </body>
 </html>
