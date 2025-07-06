@@ -1,53 +1,181 @@
-* {
-  box-sizing: border-box;
+body, input, select, button, .btn, th, td, h1, #total {
+  color: #fff !important;
+}
+body.light-mode, body.light-mode input, body.light-mode select, body.light-mode button, body.light-mode .btn, body.light-mode th, body.light-mode td, body.light-mode h1, body.light-mode #total {
+  color: #222 !important;
+}
+
+:root {
+  --primary: #007bff;
+  --primary-dark: #0056b3;
+  --background-light: #f0f4f8;
+  --background-dark: #181a1b;
+  --card-light: #fff;
+  --card-dark: #23272a;
+  --text-light: #222;
+  --text-dark: #f4f4f4;
+  --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --transition: 0.4s cubic-bezier(.4,0,.2,1);
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background: #f0f4f8;
-  color: #333;
+  background: var(--background-light);
+  color: var(--text-light);
+  transition: background var(--transition), color var(--transition);
+}
+
+body.dark-mode {
+  background: var(--background-dark);
+  color: var(--text-dark);
+}
+
+.card {
+  background: var(--card-light);
+  border-radius: 18px;
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 24px;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+body.dark-mode .card {
+  background: var(--card-dark);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25);
 }
 
 .main-container {
-  padding: 20px;
   max-width: 900px;
-  margin: auto;
+  margin: 40px auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  letter-spacing: 1px;
 }
 
 .form-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+  gap: 12px;
+  margin-bottom: 0;
 }
 
-input, select, button {
-  padding: 10px;
+input, select {
+  border-radius: 12px;
+  border: 1.5px solid #ccc;
+  padding: 12px;
   font-size: 1rem;
   flex: 1;
+  outline: none;
+  background: transparent;
+  transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
 }
 
-button {
-  background: #007BFF;
-  color: white;
+input:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+  background: #eaf4ff;
+}
+
+body.dark-mode input:focus, body.dark-mode select:focus {
+  background: #23272a;
+}
+
+.btn, button, .add-btn {
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary) 0%, #00c6ff 100%);
+  color: #fff;
   border: none;
+  padding: 12px 32px;
+  font-size: 1rem;
   cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background var(--transition), transform 0.2s, box-shadow var(--transition);
+  outline: none;
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover {
-  background: #0056b3;
+.btn:hover, button:hover, .add-btn:hover {
+  background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary) 100%);
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f9d423 0%, #ff4e50 100%);
+  color: #fff;
+  border: none;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  transition: background 0.4s, transform 0.2s;
+  overflow: hidden;
+}
+.theme-toggle:hover {
+  background: linear-gradient(135deg, #ff4e50 0%, #f9d423 100%);
+  transform: scale(1.1) rotate(15deg);
+}
+.icon-sun, .icon-moon {
+  transition: opacity 0.4s, transform 0.4s;
+  position: absolute;
+}
+body.light-mode .icon-sun {
+  opacity: 1;
+  transform: scale(1);
+}
+body.light-mode .icon-moon {
+  opacity: 0;
+  transform: scale(0.5);
+}
+body.dark-mode .icon-sun {
+  opacity: 0;
+  transform: scale(0.5);
+}
+body.dark-mode .icon-moon {
+  opacity: 1;
+  transform: scale(1);
+}
+.icon-sun::before {
+  content: "☀️";
+}
+.icon-moon::before {
+  content: "🌙";
+}
+
+/* Center the Add Expense Button */
+.center-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 
 .expensetable-list {
   max-height: 400px;
   overflow-y: auto;
-  overflow-x: auto;
-  background: #fff;
-  border-radius: 8px;
+  background: var(--card-light);
+  border-radius: 12px;
   padding: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+body.dark-mode .expensetable-list {
+  background: var(--card-dark);
 }
 
 .table-wrapper {
@@ -61,22 +189,46 @@ table {
 }
 
 th, td {
-  padding: 10px;
+  padding: 12px;
   border: 1px solid #ccc;
   text-align: left;
+  transition: background var(--transition), color var(--transition);
 }
 
 th {
-  background: #007BFF;
+  background: var(--primary);
   color: white;
   position: sticky;
   top: 0;
   z-index: 2;
 }
 
+tr {
+  transition: background 0.4s, opacity 0.4s;
+}
+
+tr.added {
+  background: #d1e7fd;
+  opacity: 0;
+  animation: fadeIn 0.6s forwards;
+}
+
+tr.removed {
+  animation: fadeOut 0.6s forwards;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+@keyframes fadeOut {
+  to { opacity: 0; }
+}
+
 #total {
   margin-top: 10px;
   font-weight: bold;
+  font-size: 1.1rem;
+  text-align: right;
 }
 
 @media (max-width: 600px) {
@@ -84,6 +236,6 @@ th {
     flex-direction: column;
   }
   .expensetable-list table {
-    min-width: 600px;
+    min-width: 400px;
   }
 }
